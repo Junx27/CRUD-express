@@ -1,63 +1,75 @@
 const userService = require("../services/users-service");
 
 class UserController {
-  // Mendapatkan semua data pengguna
+  // Get all users
   async getAllData(req, res) {
     try {
-      const data = await userService.fetchAllData();
-      res.status(200).json(data);
+      const users = await userService.fetchAllData();
+      res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  // Membuat pengguna baru
+  // Create a new user
   async createData(req, res) {
     try {
-      const newData = await userService.addUser(req.body);
+      const userData = req.body;
+      const createdUser = await userService.addUser(userData);
       res
         .status(201)
-        .json({ message: "User created successfully", data: newData });
+        .json({ message: "User created successfully", data: createdUser });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
   }
 
-  // Mendapatkan data pengguna berdasarkan ID
+  // Get user by ID
   async getUserById(req, res) {
     try {
-      const user = await userService.getUserById(req.params.id);
+      const id = req.params.id;
+      const user = await userService.getUserById(id);
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  // Memperbarui data pengguna
-  async updateData(req, res) {
+  // Update a user
+  async update(req, res) {
     try {
-      const updatedData = await userService.updateUser(req.params.id, req.body);
-      if (!updatedData) {
+      const userId = req.params.id;
+      const userData = req.body;
+      const updatedUser = await userService.updateUser(userId, userData);
+
+      if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      res
-        .status(200)
-        .json({ message: "User updated successfully", data: updatedData });
+
+      res.status(200).json({
+        message: "User updated successfully",
+        data: updatedUser,
+      });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
   }
 
-  // Menghapus pengguna berdasarkan ID
-  async deleteData(req, res) {
+  // Delete a user
+  async deleteUser(req, res) {
     try {
-      const rowsDeleted = await userService.deleteUser(req.params.id);
-      if (rowsDeleted === 0) {
+      const userId = req.params.id;
+      const deletedRows = await userService.deleteUser(userId);
+
+      if (deletedRows === 0) {
         return res.status(404).json({ message: "User not found" });
       }
+
       res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
